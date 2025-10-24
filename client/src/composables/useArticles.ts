@@ -82,7 +82,7 @@ export function useArticles() {
   }
 
   // Update article
-  const updateArticle = async (id: string, content: string) => {
+  const updateArticle = async (id: string, content: string, onSuccess?: () => void) => {
     loading.value = true
     error.value = null
 
@@ -98,6 +98,11 @@ export function useArticles() {
         }
       }
 
+      // Call success callback to trigger refetch in parent
+      if (onSuccess) {
+        onSuccess()
+      }
+
       return updatedArticle
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to update article'
@@ -109,7 +114,7 @@ export function useArticles() {
   }
 
   // Delete article
-  const deleteArticle = async (id: string, imageUrl: string | null) => {
+  const deleteArticle = async (id: string, imageUrl: string | null, onSuccess?: () => void) => {
     loading.value = true
     error.value = null
 
@@ -118,6 +123,11 @@ export function useArticles() {
 
       // Remove from local state
       articles.value = articles.value.filter((a) => a.id !== id)
+
+      // Call success callback to trigger refetch in parent
+      if (onSuccess) {
+        onSuccess()
+      }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to delete article'
       console.error('Error deleting article:', err)

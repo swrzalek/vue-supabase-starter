@@ -7,6 +7,11 @@ const props = defineProps<{
   article: Article
 }>()
 
+const emit = defineEmits<{
+  articleUpdated: []
+  articleDeleted: []
+}>()
+
 const { updateArticle, deleteArticle, isOwner } = useArticles()
 
 const isEditing = ref(false)
@@ -41,7 +46,9 @@ const handleEdit = async () => {
   if (!editContent.value.trim()) return
 
   try {
-    await updateArticle(props.article.id, editContent.value)
+    await updateArticle(props.article.id, editContent.value, () => {
+      emit('articleUpdated')
+    })
     isEditing.value = false
   } catch (error) {
     console.error('Error updating article:', error)
@@ -53,7 +60,9 @@ const handleDelete = async () => {
 
   isDeleting.value = true
   try {
-    await deleteArticle(props.article.id, props.article.image_url)
+    await deleteArticle(props.article.id, props.article.image_url, () => {
+      emit('articleDeleted')
+    })
   } catch (error) {
     console.error('Error deleting article:', error)
     isDeleting.value = false

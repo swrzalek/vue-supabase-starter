@@ -57,6 +57,8 @@ onMounted(async () => {
             v-for="article in articles"
             :key="article.id"
             :article="article"
+            @article-updated="fetchArticles"
+            @article-deleted="fetchArticles"
           />
         </div>
       </div>
