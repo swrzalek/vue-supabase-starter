@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useAuth } from '@/composables/useAuth'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const { currentUser, isAuthenticated, signOut } = useAuth()
 const router = useRouter()
+const route = useRoute()
 
 const handleLogout = async () => {
   try {
@@ -36,8 +37,6 @@ const getInitials = (email: string | undefined) => {
 
         <nav class="nav">
           <template v-if="isAuthenticated">
-            <router-link to="/dashboard" class="nav-link">Dashboard</router-link>
-
             <div class="user-menu">
               <div class="user-avatar" :title="currentUser?.email ?? 'User'">
                 {{ getInitials(currentUser?.email) }}
@@ -50,8 +49,11 @@ const getInitials = (email: string | undefined) => {
           </template>
 
           <template v-else>
-            <router-link to="/login" class="btn btn-outline">Login</router-link>
-            <router-link to="/signup" class="btn btn-primary">Sign Up</router-link>
+            <!-- Hide login/signup buttons on home page (they're in the CTA banner) -->
+            <template v-if="route.name !== 'home'">
+              <router-link to="/login" class="btn btn-outline">Login</router-link>
+              <router-link to="/signup" class="btn btn-primary">Sign Up</router-link>
+            </template>
           </template>
         </nav>
       </div>

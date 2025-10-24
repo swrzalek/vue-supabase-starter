@@ -1,63 +1,63 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
-import { useRouter } from 'vue-router'
+import { useArticles } from '@/composables/useArticles'
+import ArticleForm from '@/components/ArticleForm.vue'
+import ArticleCard from '@/components/ArticleCard.vue'
 
 const { isAuthenticated } = useAuth()
-const router = useRouter()
+const { articles, loading, fetchArticles } = useArticles()
 
-const navigateToDashboard = () => {
-  if (isAuthenticated.value) {
-    router.push('/dashboard')
-  } else {
-    router.push('/login')
-  }
-}
+onMounted(async () => {
+  await fetchArticles()
+})
 </script>
 
 <template>
   <div class="home-page">
-    <div class="hero">
-      <div class="hero-content">
-        <h1 class="hero-title">Welcome to Article App</h1>
-        <p class="hero-description">
-          A modern platform for creating, publishing, and discovering articles. Share your thoughts,
-          stories, and insights with the world.
+    <div class="container">
+      <div class="page-header">
+        <h1 class="page-title">{{ isAuthenticated ? 'Your Feed' : 'Public Feed' }}</h1>
+        <p class="page-subtitle">
+          {{ isAuthenticated ? 'Share your thoughts with the world' : 'See what others are sharing' }}
         </p>
-        <div class="hero-actions">
-          <button @click="navigateToDashboard" class="btn btn-primary btn-lg">
-            {{ isAuthenticated ? 'Go to Dashboard' : 'Get Started' }}
-          </button>
-          <router-link v-if="!isAuthenticated" to="/login" class="btn btn-outline btn-lg">
-            Sign In
-          </router-link>
+      </div>
+
+      <!-- Article Form - Only for authenticated users -->
+      <ArticleForm v-if="isAuthenticated" @article-created="fetchArticles" />
+
+      <!-- Call to action for non-authenticated users -->
+      <div v-if="!isAuthenticated" class="cta-banner">
+        <div class="cta-content">
+          <h2>Join the conversation</h2>
+          <p>Sign up to share your thoughts and connect with others</p>
+          <div class="cta-actions">
+            <router-link to="/signup" class="btn btn-primary">Sign Up</router-link>
+            <router-link to="/login" class="btn btn-outline">Sign In</router-link>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="features">
-      <div class="container">
-        <h2 class="features-title">Features</h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">📝</div>
-            <h3>Article Management</h3>
-            <p>Create, edit, and organize your articles with an intuitive and powerful editor.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">🌐</div>
-            <h3>Public Articles</h3>
-            <p>Browse and read publicly available articles from our community of writers.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">✍️</div>
-            <h3>Rich Content</h3>
-            <p>Publish articles with rich formatting and beautiful layouts that engage readers.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">🔒</div>
-            <h3>Secure Publishing</h3>
-            <p>Control your content with authentication and manage who can see your articles.</p>
-          </div>
+      <!-- Articles Feed -->
+      <div class="articles-feed">
+        <div v-if="loading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading articles...</p>
+        </div>
+
+        <div v-else-if="articles.length === 0" class="empty-state">
+          <div class="empty-icon">📝</div>
+          <h3>No articles yet</h3>
+          <p v-if="isAuthenticated">Be the first to share something!</p>
+          <p v-else>Check back soon for new content</p>
+        </div>
+
+        <div v-else class="articles-list">
+          <ArticleCard
+            v-for="article in articles"
+            :key="article.id"
+            :article="article"
+          />
         </div>
       </div>
     </div>
@@ -68,88 +68,89 @@ const navigateToDashboard = () => {
 .home-page {
   min-height: calc(100vh - 4rem);
   min-height: calc(100dvh - 4rem);
-}
-
-.hero {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-primary) 5%, transparent) 0%,
-    color-mix(in srgb, var(--color-primary-light) 5%, transparent) 100%
-  );
   padding-block: var(--spacing-2xl);
-  min-height: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: var(--color-surface);
 }
 
-.hero-content {
-  max-width: var(--container-md);
-  margin-inline: auto;
+.page-header {
   text-align: center;
-  padding-inline: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
 }
 
-.hero-title {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 800;
-  margin-bottom: var(--spacing-lg);
+.page-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.hero-description {
-  font-size: clamp(1rem, 2vw, 1.25rem);
+.page-subtitle {
+  font-size: 1rem;
   color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-2xl);
-  line-height: 1.6;
 }
 
-.hero-actions {
+.cta-banner {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 5%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary-light) 5%, transparent) 100%
+  );
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+  margin-bottom: var(--spacing-2xl);
+  text-align: center;
+
+  & h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  & p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-lg);
+  }
+}
+
+.cta-content {
+  max-width: 500px;
+  margin-inline: auto;
+}
+
+.cta-actions {
   display: flex;
   gap: var(--spacing-md);
   justify-content: center;
   flex-wrap: wrap;
 }
 
-.btn-lg {
-  padding: var(--spacing-md) var(--spacing-xl);
-  font-size: 1rem;
+.articles-feed {
+  margin-top: var(--spacing-2xl);
 }
 
-.features {
-  padding-block: var(--spacing-2xl);
-  background-color: var(--color-background);
-}
-
-.features-title {
+.loading-state {
   text-align: center;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  font-weight: 700;
-  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-2xl);
+  color: var(--color-text-secondary);
+
+  & .spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: var(--spacing-md);
+  }
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--spacing-xl);
-  margin-block: var(--spacing-2xl);
-}
-
-.feature-card {
-  padding: var(--spacing-xl);
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  transition: all var(--transition-base);
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
-  }
 
   & h3 {
     font-size: 1.25rem;
@@ -159,28 +160,36 @@ const navigateToDashboard = () => {
 
   & p {
     color: var(--color-text-secondary);
-    line-height: 1.6;
   }
 }
 
-.feature-icon {
-  font-size: 2.5rem;
+.empty-icon {
+  font-size: 3rem;
   margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.articles-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 @media (max-width: 768px) {
-  .hero {
-    padding-block: var(--spacing-xl);
-    min-height: 400px;
+  .home-page {
+    padding-block: var(--spacing-lg);
   }
 
-  .hero-actions {
+  .page-header {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .cta-banner {
+    padding: var(--spacing-xl);
+  }
+
+  .cta-actions {
     flex-direction: column;
-    align-items: stretch;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

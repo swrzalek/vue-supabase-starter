@@ -37,7 +37,7 @@ const handleSubmit = async () => {
     await signUp(email.value, password.value)
     success.value = 'Account created successfully! Redirecting...'
     setTimeout(() => {
-      router.push('/dashboard')
+      router.push('/')
     }, 1500)
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to create account. Please try again.'

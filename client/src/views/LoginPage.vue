@@ -22,7 +22,7 @@ const handleSubmit = async () => {
 
   try {
     await signIn(email.value, password.value)
-    router.push('/dashboard')
+    router.push('/')
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.'
   } finally {

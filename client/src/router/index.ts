@@ -5,7 +5,6 @@ import { useAuth } from '@/composables/useAuth'
 import HomePage from '@/views/HomePage.vue'
 import LoginPage from '@/views/LoginPage.vue'
 import SignupPage from '@/views/SignupPage.vue'
-import DashboardPage from '@/views/DashboardPage.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -25,12 +24,6 @@ const routes: RouteRecordRaw[] = [
     name: 'signup',
     component: SignupPage,
     meta: { requiresAuth: false, guestOnly: true },
-  },
-  {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: DashboardPage,
-    meta: { requiresAuth: true },
   },
 ]
 
@@ -71,7 +64,7 @@ router.beforeEach((to, from, next) => {
 
     // Check if route is guest only (login/signup) and user is already authenticated
     if (to.meta.guestOnly && isAuthenticated.value) {
-      next({ name: 'dashboard' })
+      next({ name: 'home' })
       return
     }
 
