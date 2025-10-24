@@ -1,48 +1,59 @@
-# client
+# Vue 3 + Supabase Client
 
-This template should help get you started developing with Vue 3 in Vite.
+This is the frontend application for the Vue 3 + Supabase starter template.
 
-## Recommended IDE Setup
+📖 **For complete documentation, see the [main README](../README.md) in the project root.**
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## Quick Start
 
 ```sh
+# Install dependencies
 npm install
-```
 
-### Compile and Hot-Reload for Development
-
-```sh
+# Start development server
 npm run dev
-```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
+# Build for production
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## Available Scripts
 
-```sh
-npm run lint
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build locally
+- `npm run type-check` - Run TypeScript type checking
+- `npm run lint` - Lint and fix code with ESLint and oxlint
+- `npm run format` - Format code with Prettier
+
+## IDE Setup
+
+**Recommended:**
+- [VS Code](https://code.visualstudio.com/)
+- [Vue Official Extension](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (disable Vetur if installed)
+
+**Browser DevTools:**
+- [Vue.js devtools for Chrome](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
+- [Vue.js devtools for Firefox](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
+
+## Project Structure
+
 ```
+src/
+├── components/     # Reusable Vue components
+├── composables/    # Vue composition functions
+├── lib/           # Library configurations (Supabase)
+├── router/        # Vue Router configuration
+├── stores/        # Pinia stores
+├── styles/        # Global CSS styles
+├── views/         # Page components
+├── App.vue        # Root component
+└── main.ts        # Application entry point
+```
+
+## Learn More
+
+- 📚 [Full Documentation](../README.md)
+- 🚀 [Vue 3 Docs](https://vuejs.org/)
+- 🔐 [Supabase Docs](https://supabase.com/docs)
+- ⚡ [Vite Docs](https://vitejs.dev/)
