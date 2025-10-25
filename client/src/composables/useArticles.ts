@@ -1,13 +1,7 @@
-/**
- * Articles Composable - Provides article service methods
- *
- * This composable provides service methods for article operations.
- * State management is handled by parent components.
- */
-
 import { ArticleService } from '@/services/article.service'
 import { useAuth } from '@/composables/useAuth'
 import type { Article, CreateArticleDto, UpdateArticleDto } from '@/types'
+import { ref } from 'vue'
 
 export const ERROR_MESSAGES = {
   ARTICLE_CREATE_FAILED: 'Failed to create article',
@@ -19,69 +13,62 @@ export const ERROR_MESSAGES = {
 
 export function useArticles() {
   const { currentUser } = useAuth()
+  const articles = ref<Article[]>([])
 
-  /**
-   * Fetch all articles
-   */
   const fetchArticles = async () => {
-    try {
-      return await ArticleService.query()
-    } catch (err) {
-      console.error('Error fetching articles:', err)
-      throw err
+    const { error, data } = await ArticleService.query()
+    if (error) {
+      alert(ERROR_MESSAGES.ARTICLE_FETCH_FAILED)
+    }
+
+    if (data) {
+      articles.value = data
     }
   }
 
-  /**
-   * Create a new article
-   */
   const createArticle = async (articlePayload: CreateArticleDto) => {
     if (!currentUser.value) {
-      throw new Error('User not authenticated')
+      alert('User not authenticated')
+      return
     }
 
     const { data, error } = await ArticleService.create(currentUser.value.id, articlePayload)
-
     if (error) {
-      throw error
+      alert(ERROR_MESSAGES.ARTICLE_CREATE_FAILED)
     }
-
-    return data
+    if (data) {
+      await fetchArticles()
+    }
   }
 
-  /**
-   * Update an existing article
-   */
   const updateArticle = async (id: string, article: UpdateArticleDto) => {
     const { data, error } = await ArticleService.update(id, article)
 
     if (error) {
-      throw error
+      alert(ERROR_MESSAGES.ARTICLE_UPDATE_FAILED)
     }
 
-    return data
+    if(data) {
+      await fetchArticles()
+    }
   }
 
-  /**
-   * Delete an article
-   */
   const deleteArticle = async (id: string, imageUrl: string | null) => {
-    try {
-      await ArticleService.remove(id, imageUrl)
-    } catch (err) {
-      console.error('Error deleting article:', err)
-      throw err
+    const { error } = await ArticleService.remove(id, imageUrl)
+
+    if (error) {
+      alert(ERROR_MESSAGES.ARTICLE_DELETE_FAILED)
+    } else {
+      await fetchArticles()
     }
   }
 
-  /**
-   * Check if current user owns an article
-   */
   const isOwner = (article: Article): boolean => {
     return currentUser.value?.id === article.user_id
   }
 
   return {
+    articles,
     fetchArticles,
     createArticle,
     updateArticle,
@@ -89,4 +76,3 @@ export function useArticles() {
     isOwner,
   }
 }
-

@@ -4,68 +4,13 @@ import { useAuth } from '@/composables/useAuth'
 import { useArticles } from '@/composables/useArticles'
 import ArticleForm from '@/components/ArticleForm.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
-import type { Article, CreateArticleDto, UpdateArticleDto } from '@/types'
 
 const { isAuthenticated } = useAuth()
-const { fetchArticles, createArticle, updateArticle, deleteArticle } = useArticles()
+const { fetchArticles, createArticle, updateArticle, deleteArticle, articles } = useArticles()
 
-// State management in parent
-const articles = ref<Article[]>([])
 const loading = ref(false)
-const error = ref<string | null>(null)
-
-const loadArticles = async () => {
-  loading.value = true
-  error.value = null
-
-  try {
-    articles.value = await fetchArticles()
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to load articles'
-    console.error('Error loading articles:', err)
-  } finally {
-    loading.value = false
-  }
-}
-
-const handleCreateArticle = async (payload: CreateArticleDto) => {
-  try {
-    await createArticle(payload)
-    // Reload articles after creation
-    await loadArticles()
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to create article'
-    console.error('Error creating article:', err)
-    alert('Failed to create article')
-  }
-}
-
-const handleUpdateArticle = async (id: string, payload: UpdateArticleDto) => {
-  try {
-    await updateArticle(id, payload)
-    // Reload articles after update
-    await loadArticles()
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to update article'
-    console.error('Error updating article:', err)
-    alert('Failed to update article')
-  }
-}
-
-const handleDeleteArticle = async (id: string, imageUrl: string | null) => {
-  try {
-    await deleteArticle(id, imageUrl)
-    // Remove article from local state immediately
-    articles.value = articles.value.filter(article => article.id !== id)
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to delete article'
-    console.error('Error deleting article:', err)
-    alert('Failed to delete article')
-  }
-}
-
 onMounted(async () => {
-  await loadArticles()
+  await fetchArticles()
 })
 </script>
 
@@ -80,7 +25,7 @@ onMounted(async () => {
       </div>
 
       <!-- Article Form - Only for authenticated users -->
-      <ArticleForm v-if="isAuthenticated" @create="handleCreateArticle" />
+      <ArticleForm v-if="isAuthenticated" @create="createArticle" />
 
       <!-- Call to action for non-authenticated users -->
       <div v-if="!isAuthenticated" class="cta-banner">
@@ -113,8 +58,8 @@ onMounted(async () => {
             v-for="article in articles"
             :key="article.id"
             :article="article"
-            @update="handleUpdateArticle"
-            @delete="handleDeleteArticle"
+            @update="updateArticle"
+            @delete="deleteArticle"
           />
         </div>
       </div>

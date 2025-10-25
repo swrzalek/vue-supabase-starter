@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import type {Database} from "@/types/database.types.ts";
 
 // Supabase client configuration
 // Uses environment variables from .env.local for local development
@@ -12,5 +13,5 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 

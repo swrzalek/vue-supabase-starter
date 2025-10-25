@@ -8,22 +8,25 @@
 import { supabase } from '@/lib/supabase'
 import type { Article, CreateArticleDto, UpdateArticleDto } from '@/types'
 import { STORAGE_CONFIG } from '@/config/constants'
+import type { PostgrestError } from '@supabase/supabase-js'
+
+type QueryResult<T> = { data: T | null; error: PostgrestError | unknown }
 
 export const ArticleService = {
-  /**
-   * Query all articles ordered by creation date (newest first)
-   */
-  async query(): Promise<Article[]> {
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .order('created_at', { ascending: false })
+  async query(): Promise<QueryResult<Article[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .order('created_at', { ascending: false })
 
-    if (error) throw error
-    return data || []
+      return { data, error }
+    } catch (e) {
+      return { data: null, error: e }
+    }
   },
 
-  async create(userId: string, dto: CreateArticleDto) {
+  async create(userId: string, dto: CreateArticleDto): Promise<QueryResult<Article>> {
     let imageUrl: string | null = null
 
     // Upload image if provided
@@ -32,29 +35,23 @@ export const ArticleService = {
     }
 
     try {
-
-    const { data, error } = await supabase
-      .from('articles')
-      .insert([
-        {
-          user_id: userId,
-          content: dto.content,
-          image_url: imageUrl,
-        },
-      ])
-      .select()
-      .single()
+      const { data, error } = await supabase
+        .from('articles')
+        .insert([
+          {
+            user_id: userId,
+            content: dto.content,
+            image_url: imageUrl,
+          },
+        ])
+        .select()
+        .single()
       return { data, error }
-    } catch(error) {
+    } catch (error) {
       return { data: null, error }
     }
-
-
   },
-
-  /**
-   * Update an existing article
-   */
+  
   async update(id: string, dto: UpdateArticleDto) {
     try {
       const { data, error } = await supabase
@@ -72,27 +69,19 @@ export const ArticleService = {
       return { data: null, error }
     }
   },
+  async remove(id: string, imageUrl: string | null): Promise<QueryResult<null>> {
+    try {
+      if (imageUrl) {
+        await this.deleteImage(imageUrl)
+      }
 
-  /**
-   * Remove an article and its associated image
-   */
-  async remove(id: string, imageUrl: string | null): Promise<void> {
-    // Delete image from storage if exists
-    if (imageUrl) {
-      await this.deleteImage(imageUrl)
-    }
-
-    // Delete article record
-    const { error, data } = await supabase.from('articles').delete().eq('id', id)
-
-    if (error) {
-      console.error('Error deleting article:', error)
+      const { error, data } = await supabase.from('articles').delete().eq('id', id)
+      return { data: null, error }
+    } catch (e) {
+      return { data: null, error: e }
     }
   },
 
-  /**
-   * Upload an image to storage
-   */
   async uploadImage(userId: string, file: File): Promise<string> {
     const fileExt = file.name.split('.').pop()
     const fileName = `${userId}/${Date.now()}.${fileExt}`
@@ -111,9 +100,6 @@ export const ArticleService = {
     return data.publicUrl
   },
 
-  /**
-   * Delete an image from storage
-   */
   async deleteImage(imageUrl: string): Promise<void> {
     const path = imageUrl.split(`/${STORAGE_CONFIG.ARTICLE_IMAGES_BUCKET}/`)[1]
     if (!path) return
@@ -128,4 +114,3 @@ export const ArticleService = {
     }
   },
 }
-
