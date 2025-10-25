@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import {  onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useArticles } from '@/composables/useArticles'
 import ArticleForm from '@/components/ArticleForm.vue'
@@ -8,7 +8,6 @@ import ArticleCard from '@/components/ArticleCard.vue'
 const { isAuthenticated } = useAuth()
 const { fetchArticles, createArticle, updateArticle, deleteArticle, articles } = useArticles()
 
-const loading = ref(false)
 onMounted(async () => {
   await fetchArticles()
 })
@@ -41,12 +40,7 @@ onMounted(async () => {
 
       <!-- Articles Feed -->
       <div class="articles-feed">
-        <div v-if="loading" class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading articles...</p>
-        </div>
-
-        <div v-else-if="articles.length === 0" class="empty-state">
+        <div v-if="articles.length === 0" class="empty-state">
           <div class="empty-icon">📝</div>
           <h3>No articles yet</h3>
           <p v-if="isAuthenticated">Be the first to share something!</p>

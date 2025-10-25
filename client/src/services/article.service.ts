@@ -51,7 +51,7 @@ export const ArticleService = {
       return { data: null, error }
     }
   },
-  
+
   async update(id: string, dto: UpdateArticleDto) {
     try {
       const { data, error } = await supabase
