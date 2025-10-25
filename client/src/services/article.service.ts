@@ -79,9 +79,11 @@ export const ArticleService = {
     }
 
     // Delete article record
-    const { error } = await supabase.from('articles').delete().eq('id', id)
+    const { error, data } = await supabase.from('articles').delete().eq('id', id)
 
-    if (error) throw error
+    if (error) {
+      console.error('Error deleting article:', error)
+    }
   },
 
   /**

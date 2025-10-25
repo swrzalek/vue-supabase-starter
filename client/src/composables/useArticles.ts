@@ -9,19 +9,20 @@ import { ref, computed } from 'vue'
 import { ArticleService } from '@/services/article.service'
 import { useAuth } from '@/composables/useAuth'
 import type { Article, ArticleWithUser, CreateArticleDto, UpdateArticleDto } from '@/types'
-import { ERROR_MESSAGES } from '@/config/constants'
 
-// Shared state (singleton)
-const articles = ref<ArticleWithUser[]>([])
-const loading = ref(false)
-const error = ref<string | null>(null)
+export const ERROR_MESSAGES = {
+  ARTICLE_CREATE_FAILED: 'Failed to create article',
+  ARTICLE_UPDATE_FAILED: 'Failed to update article',
+  ARTICLE_DELETE_FAILED: 'Failed to delete article',
+  ARTICLE_FETCH_FAILED: 'Failed to load articles',
+  GENERIC_ERROR: 'Something went wrong. Please try again.',
+} as const
 
 export function useArticles() {
+  const articles = ref<ArticleWithUser[]>([])
+  const loading = ref(false)
+  const error = ref<string | null>(null)
   const { currentUser } = useAuth()
-
-  // Computed
-  const articleCount = computed(() => articles.value.length)
-  const hasArticles = computed(() => articles.value.length > 0)
 
   /**
    * Enrich article with user display information
@@ -124,9 +125,6 @@ export function useArticles() {
 
     try {
       await ArticleService.remove(id, imageUrl)
-
-      // Remove from local state
-      articles.value = articles.value.filter((a) => a.id !== id)
     } catch (err) {
       error.value = err instanceof Error ? err.message : ERROR_MESSAGES.ARTICLE_DELETE_FAILED
       console.error('Error deleting article:', err)
@@ -148,10 +146,6 @@ export function useArticles() {
     articles: computed(() => articles.value),
     loading: computed(() => loading.value),
     error: computed(() => error.value),
-
-    // Computed
-    articleCount,
-    hasArticles,
 
     // Actions
     fetchArticles,
