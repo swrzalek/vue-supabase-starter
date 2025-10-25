@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import {onMounted, watch} from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useArticles } from '@/composables/useArticles'
 import ArticleForm from '@/components/ArticleForm.vue'
@@ -10,6 +10,10 @@ const { articles, loading, fetchArticles } = useArticles()
 
 onMounted(async () => {
   await fetchArticles()
+})
+
+watch(articles, (newArticles) => {
+  console.log('Articles updated:', newArticles)
 })
 </script>
 

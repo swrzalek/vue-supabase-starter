@@ -19,45 +19,19 @@ export const ERROR_MESSAGES = {
 } as const
 
 export function useArticles() {
-  const articles = ref<ArticleWithUser[]>([])
+  const articles = ref<Article[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
   const { currentUser } = useAuth()
 
-  /**
-   * Enrich article with user display information
-   */
-  const enrichArticle = (article: Article): ArticleWithUser => {
-    let userEmail = 'Anonymous'
 
-    if (currentUser.value && article.user_id === currentUser.value.id) {
-      userEmail = currentUser.value.email || 'User'
-    } else {
-      userEmail = `User ${article.user_id.slice(0, 8)}`
-    }
-
-    return {
-      ...article,
-      user_email: userEmail,
-    }
-  }
-
-  /**
-   * Fetch all articles from the database
-   */
   const fetchArticles = async () => {
-    loading.value = true
-    error.value = null
-
     try {
       const data = await ArticleService.query()
-      articles.value = data.map(enrichArticle)
+      console.log(data);
+      articles.value = data
     } catch (err) {
-      error.value = err instanceof Error ? err.message : ERROR_MESSAGES.ARTICLE_FETCH_FAILED
-      console.error('Error fetching articles:', err)
-      throw err
-    } finally {
-      loading.value = false
+      alert(ERROR_MESSAGES.ARTICLE_FETCH_FAILED);
     }
   }
 
@@ -65,27 +39,19 @@ export function useArticles() {
    * Create a new article
    */
   const createArticle = async (articlePayload: CreateArticleDto) => {
-    if (!currentUser.value) {
-      throw new Error('User must be authenticated to create articles')
+    if(!currentUser.value) {
+      alert('User not authenticated');
+      return;
     }
 
-    loading.value = true
-    error.value = null
+    const { data, error } = await ArticleService.create(currentUser.value.id, articlePayload)
 
-    try {
-      const article = await ArticleService.create(currentUser.value.id, articlePayload)
-      const enrichedArticle = enrichArticle(article)
+    if(data) {
+      fetchArticles();
+    }
 
-      // Add to beginning of array
-      articles.value.unshift(enrichedArticle)
-
-      return enrichedArticle
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : ERROR_MESSAGES.ARTICLE_CREATE_FAILED
-      console.error('Error creating article:', err)
-      throw err
-    } finally {
-      loading.value = false
+    if(error) {
+      alert(ERROR_MESSAGES.ARTICLE_CREATE_FAILED);
     }
   }
 
@@ -93,32 +59,16 @@ export function useArticles() {
    * Update an existing article
    */
   const updateArticle = async (id: string, article: UpdateArticleDto) => {
-    loading.value = true
-    error.value = null
+    const { data, error } = await ArticleService.update(id, article)
+    if(data) {
+      fetchArticles();
+    }
 
-    try {
-      const updatedArticle = await ArticleService.update(id, article)
-
-      // Update in local state
-      const index = articles.value.findIndex((a) => a.id === id)
-      if (index !== -1) {
-        const enrichedUpdate = enrichArticle(updatedArticle)
-        articles.value[index] = enrichedUpdate
-      }
-
-      return updatedArticle
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : ERROR_MESSAGES.ARTICLE_UPDATE_FAILED
-      console.error('Error updating article:', err)
-      throw err
-    } finally {
-      loading.value = false
+    if(error) {
+      alert(ERROR_MESSAGES.ARTICLE_UPDATE_FAILED);
     }
   }
 
-  /**
-   * Delete an article
-   */
   const deleteArticle = async (id: string, imageUrl: string | null) => {
     loading.value = true
     error.value = null

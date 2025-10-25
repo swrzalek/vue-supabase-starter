@@ -23,10 +23,7 @@ export const ArticleService = {
     return data || []
   },
 
-  /**
-   * Create a new article with optional image upload
-   */
-  async create(userId: string, dto: CreateArticleDto): Promise<Article> {
+  async create(userId: string, dto: CreateArticleDto) {
     let imageUrl: string | null = null
 
     // Upload image if provided
@@ -34,7 +31,8 @@ export const ArticleService = {
       imageUrl = await this.uploadImage(userId, dto.imageFile)
     }
 
-    // Create article record
+    try {
+
     const { data, error } = await supabase
       .from('articles')
       .insert([
@@ -46,27 +44,33 @@ export const ArticleService = {
       ])
       .select()
       .single()
+      return { data, error }
+    } catch(error) {
+      return { data: null, error }
+    }
 
-    if (error) throw error
-    return data
+
   },
 
   /**
    * Update an existing article
    */
-  async update(id: string, dto: UpdateArticleDto): Promise<Article> {
-    const { data, error } = await supabase
-      .from('articles')
-      .update({
-        content: dto.content,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .select()
-      .single()
+  async update(id: string, dto: UpdateArticleDto) {
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .update({
+          content: dto.content,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single()
 
-    if (error) throw error
-    return data
+      return { data, error }
+    } catch (error) {
+      return { data: null, error }
+    }
   },
 
   /**
