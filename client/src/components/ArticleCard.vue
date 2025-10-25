@@ -21,7 +21,6 @@ const editContent = ref(props.article.content)
 const handleEdit = () => {
   if (!editContent.value.trim()) return
 
-  // Emit event to parent
   emit('update', props.article.id, { content: editContent.value })
   isEditing.value = false
 }
@@ -29,7 +28,6 @@ const handleEdit = () => {
 const handleDelete = () => {
   if (!confirm('Are you sure you want to delete this article?')) return
 
-  // Emit event to parent
   emit('delete', props.article.id, props.article.image_url)
 }
 

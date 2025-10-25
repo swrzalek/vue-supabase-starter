@@ -60,6 +60,16 @@ const removeImage = () => {
   }
 }
 
+const resetForm = () => {
+  content.value = ''
+  imageFile.value = null
+  imagePreview.value = null
+
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
 const handleSubmit = async () => {
   if (!content.value.trim() && !imageFile.value) {
     error.value = VALIDATION_MESSAGES.REQUIRED_CONTENT
@@ -74,25 +84,12 @@ const handleSubmit = async () => {
   error.value = ''
   loading.value = true
 
-  try {
-    // Emit event to parent
-    emit('create', {
-      content: content.value,
-      imageFile: imageFile.value,
-    })
+  emit('create', {
+    content: content.value,
+    imageFile: imageFile.value,
+  })
 
-    // Reset form
-    content.value = ''
-    imageFile.value = null
-    imagePreview.value = null
-    if (fileInput.value) {
-      fileInput.value.value = ''
-    }
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to post article'
-  } finally {
-    loading.value = false
-  }
+  resetForm()
 }
 </script>
 

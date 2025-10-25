@@ -1,10 +1,3 @@
-/**
- * Article related TypeScript type definitions
- */
-
-/**
- * Base article entity from database
- */
 export interface Article {
   id: string
   user_id: string
