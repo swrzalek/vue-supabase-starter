@@ -116,20 +116,6 @@ const cancelEdit = () => {
   flex: 1;
 }
 
-.author-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.875rem;
-  flex-shrink: 0;
-}
-
 .author-info {
   display: flex;
   flex-direction: column;
@@ -231,12 +217,6 @@ const cancelEdit = () => {
 @media (max-width: 768px) {
   .article-card {
     padding: var(--spacing-md);
-  }
-
-  .author-avatar {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.75rem;
   }
 
   .article-image {

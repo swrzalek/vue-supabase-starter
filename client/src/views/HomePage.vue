@@ -129,19 +129,6 @@ onMounted(async () => {
   margin-top: var(--spacing-2xl);
 }
 
-.loading-state {
-  text-align: center;
-  padding: var(--spacing-2xl);
-  color: var(--color-text-secondary);
-
-  & .spinner {
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    margin-bottom: var(--spacing-md);
-  }
-}
-
 .empty-state {
   text-align: center;
   padding: var(--spacing-2xl);

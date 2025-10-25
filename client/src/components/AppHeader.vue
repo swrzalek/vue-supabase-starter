@@ -91,24 +91,6 @@ const handleLogout = async () => {
   gap: var(--spacing-md);
 }
 
-.nav-link {
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-
-  &:hover {
-    color: var(--color-text);
-    background-color: var(--color-surface);
-    text-decoration: none;
-  }
-
-  &.router-link-active {
-    color: var(--color-primary);
-  }
-}
-
 .user-email {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
