@@ -14,10 +14,7 @@ export interface Article {
   updated_at: string
 }
 
-/**
- * Data transfer object for creating a new article
- * Uses Pick to select only the content field from Article, plus imageFile
- */
+
 export type CreateArticleDto = Pick<Article, 'content'> & {
   imageFile?: File | null
 }
