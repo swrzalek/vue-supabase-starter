@@ -48,19 +48,10 @@ const cancelEdit = () => {
       </div>
 
       <div v-if="isOwner(article)" class="article-actions">
-        <button
-          v-if="!isEditing"
-          @click="isEditing = true"
-          class="action-btn"
-          title="Edit"
-        >
+        <button v-if="!isEditing" @click="isEditing = true" class="action-btn" title="Edit">
           ✏️
         </button>
-        <button
-          @click="handleDelete"
-          class="action-btn action-btn-danger"
-          title="Delete"
-        >
+        <button @click="handleDelete" class="action-btn action-btn-danger" title="Delete">
           🗑️
         </button>
       </div>
@@ -82,7 +73,12 @@ const cancelEdit = () => {
       </template>
       <template v-else>
         <p class="article-text">{{ article.content }}</p>
-        <img v-if="article.image_url" :src="article.image_url" alt="Article image" class="article-image" />
+        <img
+          v-if="article.image_url"
+          :src="article.image_url"
+          alt="Article image"
+          class="article-image"
+        />
       </template>
     </div>
   </article>
@@ -99,7 +95,6 @@ const cancelEdit = () => {
   &:hover {
     border-color: color-mix(in srgb, var(--color-primary) 20%, var(--color-border));
   }
-
 }
 
 .article-header {
@@ -224,4 +219,3 @@ const cancelEdit = () => {
   }
 }
 </style>
-

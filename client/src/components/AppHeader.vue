@@ -121,4 +121,3 @@ const handleLogout = async () => {
   }
 }
 </style>
-

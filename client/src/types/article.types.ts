@@ -7,8 +7,6 @@ export interface Article {
   updated_at: string
 }
 
-
 export type CreateArticleDto = Pick<Article, 'content'> & {
   imageFile?: File | null
 }
-

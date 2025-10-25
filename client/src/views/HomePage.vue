@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {  onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useArticles } from '@/composables/useArticles'
 import ArticleForm from '@/components/ArticleForm.vue'
@@ -19,7 +19,9 @@ onMounted(async () => {
       <div class="page-header">
         <h1 class="page-title">{{ isAuthenticated ? 'Your Feed' : 'Public Feed' }}</h1>
         <p class="page-subtitle">
-          {{ isAuthenticated ? 'Share your thoughts with the world' : 'See what others are sharing' }}
+          {{
+            isAuthenticated ? 'Share your thoughts with the world' : 'See what others are sharing'
+          }}
         </p>
       </div>
 
@@ -177,4 +179,3 @@ onMounted(async () => {
   }
 }
 </style>
-

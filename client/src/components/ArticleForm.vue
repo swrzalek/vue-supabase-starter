@@ -102,12 +102,12 @@ const handleSubmit = async () => {
     <form @submit.prevent="handleSubmit" class="form-content">
       <textarea
         v-model="content"
-          class="form-textarea"
-          placeholder="Share your thoughts..."
-          rows="3"
-          :maxlength="MAX_CONTENT_LENGTH"
-          :disabled="loading"
-        ></textarea>
+        class="form-textarea"
+        placeholder="Share your thoughts..."
+        rows="3"
+        :maxlength="MAX_CONTENT_LENGTH"
+        :disabled="loading"
+      ></textarea>
 
       <div v-if="content.length > 0" class="character-count">
         {{ content.length }} / {{ MAX_CONTENT_LENGTH }}
@@ -323,4 +323,3 @@ const handleSubmit = async () => {
   }
 }
 </style>
-

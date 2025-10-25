@@ -24,7 +24,8 @@ const handleSubmit = async () => {
     await signIn(email.value, password.value)
     router.push('/')
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.'
+    error.value =
+      err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.'
   } finally {
     isLoading.value = false
   }
@@ -163,4 +164,3 @@ const handleSubmit = async () => {
   }
 }
 </style>
-

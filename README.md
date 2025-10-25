@@ -1,542 +1,657 @@
-# Vue 3 + Supabase Starter Template
+# Vue 3 + Supabase Article Platform - Starter Kit
 
-A modern, production-ready starter template for building article/blog applications with Vue 3, Supabase authentication, and custom CSS. This template provides a complete authentication system with protected routes, ready for you to add your article CRUD functionality.
+A modern, production-ready boilerplate for building article/social feed applications with Vue 3, TypeScript, Supabase, and custom CSS. Features complete authentication, article CRUD with image uploads, and a beautiful responsive design.
 
-## 🚀 Features
+## ✨ Features
 
 - ✅ **Vue 3** with Composition API and `<script setup>`
-- ✅ **Supabase Authentication** - Email/password auth with session management
+- ✅ **TypeScript** - Full type safety with auto-generated database types
+- ✅ **Supabase Backend** - Authentication, PostgreSQL database, and file storage
+- ✅ **Article Management** - Create, read, update, delete articles with image uploads
 - ✅ **Protected Routes** - Route guards for authenticated and public pages
-- ✅ **Reactive State Management** - Custom auth composable with Vue reactivity
-- ✅ **Modern CSS** - Custom properties, nesting, color-mix(), no frameworks
+- ✅ **Modern CSS** - Custom properties, nesting, color-mix(), no frameworks needed
 - ✅ **Dark Mode Support** - Automatic dark mode via `prefers-color-scheme`
-- ✅ **Fully Responsive** - Mobile-first design with modern CSS features
-- ✅ **TypeScript** - Full type safety throughout the application
+- ✅ **Fully Responsive** - Mobile-first design
 - ✅ **Production Ready** - Linting, type-checking, and best practices
 
 ## 📋 Table of Contents
 
 - [Quick Start](#-quick-start)
 - [Project Structure](#-project-structure)
-- [Authentication System](#-authentication-system)
-- [Routing](#-routing)
-- [Styling Architecture](#-styling-architecture)
-- [Adding Article CRUD](#-adding-article-crud)
-- [Environment Variables](#-environment-variables)
-- [Available Scripts](#-available-scripts)
+- [Development Workflow](#-development-workflow)
+- [Customization Guide](#-customization-guide)
 - [Deployment](#-deployment)
-- [Technology Stack](#-technology-stack)
+- [Technology Stack](#️-technology-stack)
 
-## 🏁 Quick Start
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 20.19+ or 22.12+
-- npm or yarn
-- Supabase CLI (for local development)
+Before you begin, ensure you have the following installed:
 
-### Installation
+- **Node.js** 20.19+ or 22.12+ ([Download](https://nodejs.org/))
+- **npm** (comes with Node.js)
+- **Supabase CLI** ([Installation Guide](https://supabase.com/docs/guides/cli/getting-started))
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd beatflow-v3
-   ```
+#### Install Supabase CLI
 
-2. **Install dependencies**
-   ```bash
-   cd client
-   npm install
-   ```
+```bash
+# macOS (Homebrew)
+brew install supabase/tap/supabase
 
-3. **Start Supabase locally** (in project root)
-   ```bash
-   cd ..
-   supabase start
-   ```
-   
-   This will start local Supabase services on:
-   - API: http://127.0.0.1:54321
-   - Studio: http://127.0.0.1:54323
-   - Inbucket (emails): http://127.0.0.1:54324
+# Windows (Scoop)
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
 
-4. **Start the development server**
-   ```bash
-   cd client
-   npm run dev
-   ```
+# Linux/macOS/Windows (npm)
+npm install -g supabase
 
-5. **Open your browser**
-   ```
-   http://localhost:5173
-   ```
+# Verify installation
+supabase --version
+```
 
-### Testing the Authentication
+### Step-by-Step Setup
 
-1. Visit the home page - you'll see the public landing page
-2. Click "Get Started" or "Sign Up"
-3. Create an account with any email/password (minimum 6 characters)
-4. You'll be automatically logged in and redirected to the dashboard
-5. Your email and avatar (initials) will appear in the header
-6. Click "Logout" to sign out
+#### 1. Clone and Navigate
+
+```bash
+git clone <your-repo-url>
+cd beatflow-v3
+```
+
+#### 2. Install Vue App Dependencies
+
+```bash
+cd client
+npm install
+```
+
+This will install all frontend dependencies including Vue 3, Vue Router, Supabase client, and TypeScript.
+
+#### 3. Start Supabase Locally
+
+Open a new terminal and navigate back to the project root:
+
+```bash
+cd ..  # If you're in the client directory
+supabase start
+```
+
+**What this does:**
+- Downloads Docker containers for PostgreSQL, PostgREST, GoTrue (auth), and more
+- Starts local Supabase services
+- Runs all migrations automatically (creates articles table and storage bucket)
+- Sets up Row Level Security policies
+
+**First-time setup** may take 2-5 minutes to download Docker images.
+
+#### 4. Save Your Local Credentials
+
+After `supabase start` completes, you'll see output like this:
+
+```bash
+API URL: http://127.0.0.1:54321
+GraphQL URL: http://127.0.0.1:54321/graphql/v1
+S3 Storage URL: http://127.0.0.1:54321/storage/v1/s3
+DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+Studio URL: http://127.0.0.1:54323
+Inbucket URL: http://127.0.0.1:54324
+JWT secret: super-secret-jwt-token-with-at-least-32-characters-long
+anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Important:** Copy the `anon key` - you'll need it if you want to customize environment variables.
+
+💡 **For local development, the app uses default credentials automatically - no .env file needed!**
+
+#### 5. Explore Supabase Studio (Optional)
+
+Open [http://127.0.0.1:54323](http://127.0.0.1:54323) to access Supabase Studio where you can:
+- View your database tables
+- Check authentication users
+- Browse storage buckets
+- Test SQL queries
+
+#### 6. Start the Vue Development Server
+
+In a new terminal:
+
+```bash
+cd client
+npm run dev
+```
+
+The app will be available at **http://localhost:5173**
+
+#### 7. Test the Application
+
+1. Open http://localhost:5173 in your browser
+2. Click "Sign Up" and create an account (use any email/password)
+3. You'll be logged in automatically
+4. Create an article with text and/or an image
+5. Edit or delete your articles
+6. Sign out and sign back in to test authentication persistence
+
+**Email verification:** During local development, check the Inbucket email testing interface at http://127.0.0.1:54324 to see confirmation emails.
+
+---
 
 ## 📁 Project Structure
 
 ```
-client/
-├── src/
-│   ├── components/
-│   │   └── AppHeader.vue          # Header with auth status and navigation
-│   ├── composables/
-│   │   └── useAuth.ts              # Authentication composable
-│   ├── lib/
-│   │   └── supabase.ts             # Supabase client configuration
-│   ├── router/
-│   │   └── index.ts                # Vue Router with auth guards
-│   ├── stores/
-│   │   └── counter.ts              # Pinia store example
-│   ├── styles/
-│   │   └── global.css              # Global CSS with modern features
-│   ├── views/
-│   │   ├── HomePage.vue            # Public landing page
-│   │   ├── LoginPage.vue           # Login form
-│   │   ├── SignupPage.vue          # Signup form
-│   │   └── DashboardPage.vue       # Protected dashboard
-│   ├── App.vue                     # Root component
-│   └── main.ts                     # App entry point
-├── public/
-├── package.json
-├── vite.config.ts
-└── tsconfig.json
+beatflow-v3/
+├── client/                        # Vue 3 Frontend Application
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── AppHeader.vue      # Navigation with auth status
+│   │   │   ├── ArticleCard.vue    # Individual article display
+│   │   │   └── ArticleForm.vue    # Create article form
+│   │   ├── composables/
+│   │   │   ├── useAuth.ts         # Authentication logic
+│   │   │   └── useArticles.ts     # Article CRUD operations
+│   │   ├── config/
+│   │   │   └── constants.ts       # App-wide constants
+│   │   ├── lib/
+│   │   │   └── supabase.ts        # Supabase client config
+│   │   ├── router/
+│   │   │   └── index.ts           # Vue Router with guards
+│   │   ├── services/
+│   │   │   └── article.service.ts # Article API service
+│   │   ├── styles/
+│   │   │   └── global.css         # Global CSS variables & utilities
+│   │   ├── types/
+│   │   │   ├── article.types.ts   # Article type definitions
+│   │   │   ├── database.types.ts  # Auto-generated Supabase types
+│   │   │   └── index.ts           # Type exports
+│   │   ├── utils/
+│   │   │   └── date.ts            # Date formatting utilities
+│   │   ├── views/
+│   │   │   ├── HomePage.vue       # Main feed page
+│   │   │   ├── LoginPage.vue      # Login form
+│   │   │   └── SignupPage.vue     # Signup form
+│   │   ├── App.vue                # Root component
+│   │   ├── env.ts                 # Environment config
+│   │   └── main.ts                # App entry point
+│   ├── package.json               # Dependencies
+│   └── vite.config.ts             # Vite configuration
+│
+├── supabase/                      # Supabase Backend Configuration
+│   ├── config.toml                # Supabase local settings
+│   └── migrations/
+│       └── 20250124000000_create_articles.sql  # Database schema
+│
+└── README.md                      # This file
 ```
 
-## 🔐 Authentication System
+---
 
-### Auth Composable (`composables/useAuth.ts`)
+## 🔧 Development Workflow
 
-The authentication system is built around a composable that provides reactive state and methods:
+### Managing Supabase
 
-```typescript
-const { 
-  currentUser,      // Reactive user object
-  isAuthenticated,  // Boolean auth status
-  isLoading,        // Loading state
-  initialize,       // Initialize auth
-  signUp,           // Create account
-  signIn,           // Sign in
-  signOut           // Sign out
-} = useAuth()
+#### Start Supabase
+
+```bash
+# From project root
+supabase start
 ```
 
-### How It Works
+#### Stop Supabase
 
-1. **Initialization**: Auth state is initialized in `App.vue` on mount
-2. **Session Persistence**: Supabase automatically persists sessions in localStorage
-3. **Real-time Updates**: Auth state changes are automatically synced across tabs
-4. **Route Protection**: Navigation guards check auth status before route changes
-
-### Using Auth in Components
-
-```vue
-<script setup lang="ts">
-import { useAuth } from '@/composables/useAuth'
-
-const { currentUser, isAuthenticated, signOut } = useAuth()
-</script>
-
-<template>
-  <div v-if="isAuthenticated">
-    <p>Welcome, {{ currentUser?.email }}</p>
-    <button @click="signOut">Logout</button>
-  </div>
-</template>
+```bash
+supabase stop
 ```
 
-## 🛣️ Routing
+#### Reset Database (⚠️ Deletes all data)
 
-### Available Routes
-
-| Path | Component | Access | Description |
-|------|-----------|--------|-------------|
-| `/` | HomePage | Public | Landing page with features |
-| `/login` | LoginPage | Guest only | Login form |
-| `/signup` | SignupPage | Guest only | Signup form |
-| `/dashboard` | DashboardPage | Protected | User dashboard |
-
-### Route Protection
-
-Routes are protected using navigation guards in `router/index.ts`:
-
-```typescript
-// Protected route
-{
-  path: '/dashboard',
-  component: DashboardPage,
-  meta: { requiresAuth: true }
-}
-
-// Guest-only route
-{
-  path: '/login',
-  component: LoginPage,
-  meta: { guestOnly: true }
-}
+```bash
+supabase db reset
 ```
 
-**Behavior:**
-- Unauthenticated users accessing protected routes → redirected to `/login`
-- Authenticated users accessing guest-only routes → redirected to `/dashboard`
+This will:
+1. Drop all tables
+2. Rerun all migrations
+3. Reset to a clean state
 
-### Adding New Routes
+#### View Supabase Status
 
-```typescript
-// router/index.ts
-{
-  path: '/articles/:id',
-  name: 'article',
-  component: ArticleView,
-  meta: { requiresAuth: false } // Public route
-}
+```bash
+supabase status
 ```
 
-## 🎨 Styling Architecture
+### Database Type Generation
 
-### Global CSS (`styles/global.css`)
+The project includes auto-generated TypeScript types in `client/src/types/database.types.ts`. These types are already up-to-date with your schema.
 
-The template uses modern CSS features without any frameworks:
+**To regenerate types** after schema changes:
 
-- **CSS Custom Properties** for theming
-- **Native CSS Nesting** for better organization
-- **color-mix()** for dynamic color manipulation
-- **Modern viewport units** (`dvh` for mobile)
-- **Automatic dark mode** via `prefers-color-scheme`
+```bash
+# From project root
+supabase gen types typescript --local > client/src/types/database.types.ts
+```
 
-### CSS Variables
+**When to regenerate:**
+- After adding new tables or columns
+- After modifying existing table structure
+- After creating new enums or functions
 
-Customize the theme by modifying CSS variables:
+### Adding New Migrations
+
+When you need to modify the database schema:
+
+```bash
+# Create a new migration file
+supabase migration new your_migration_name
+
+# Edit the generated file in supabase/migrations/
+# Then apply it with:
+supabase db reset  # or restart supabase
+```
+
+### Development Commands
+
+```bash
+# Start development server (with hot reload)
+cd client && npm run dev
+
+# Type check (find TypeScript errors)
+cd client && npm run type-check
+
+# Lint code (auto-fix issues)
+cd client && npm run lint
+
+# Format code with Prettier
+cd client && npm run format
+
+# Build for production
+cd client && npm run build
+
+# Preview production build
+cd client && npm run preview
+```
+
+### Debugging Tips
+
+**Check Supabase Logs:**
+```bash
+# View all logs
+supabase logs
+
+# View specific service logs
+supabase logs auth
+supabase logs storage
+supabase logs db
+```
+
+**Common Issues:**
+
+1. **Port Already in Use**
+   ```bash
+   # Stop Supabase first
+   supabase stop
+   # Then start again
+   supabase start
+   ```
+
+2. **Database Connection Issues**
+   - Ensure Docker is running
+   - Check `supabase status` to verify services are up
+
+3. **Type Errors After Schema Changes**
+   - Regenerate types: `supabase gen types typescript --local > client/src/types/database.types.ts`
+   - Restart your development server
+
+---
+
+## 🎨 Customization Guide
+
+### Styling
+
+#### Change Theme Colors
+
+Edit `client/src/styles/global.css`:
 
 ```css
 :root {
-  /* Colors */
+  /* Primary brand color */
   --color-primary: #6366f1;
   --color-primary-hover: #4f46e5;
   
-  /* Spacing */
+  /* Adjust spacing scale */
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   
   /* Border radius */
   --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  
-  /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', ...;
 }
 ```
 
-### Utility Classes
+#### Add Custom Utility Classes
 
-Pre-defined utility classes available globally:
-
-```html
-<!-- Buttons -->
-<button class="btn btn-primary">Primary Button</button>
-<button class="btn btn-danger">Danger Button</button>
-<button class="btn btn-outline">Outline Button</button>
-
-<!-- Forms -->
-<div class="form-group">
-  <label class="form-label">Email</label>
-  <input class="form-input" type="email">
-</div>
-
-<!-- Cards -->
-<div class="card">
-  Card content
-</div>
-
-<!-- Container -->
-<div class="container">
-  Centered content with max-width
-</div>
-```
-
-### Scoped Styles
-
-Each component uses scoped styles for component-specific styling:
-
-```vue
-<style scoped>
-.component-specific {
-  /* Styles only apply to this component */
-}
-</style>
-```
-
-## 📝 Adding Article CRUD
-
-This template is ready for you to add article functionality. Here's how:
-
-### 1. Create Articles Table in Supabase
-
-Run this SQL in Supabase Studio or via migration:
-
-```sql
--- Create articles table
-create table articles (
-  id uuid default uuid_generate_v4() primary key,
-  user_id uuid references auth.users not null,
-  title text not null,
-  content text not null,
-  published boolean default false,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- Enable Row Level Security
-alter table articles enable row level security;
-
--- Policy: Users can view all published articles
-create policy "Public articles are viewable by everyone"
-  on articles for select
-  using (published = true);
-
--- Policy: Users can view their own articles
-create policy "Users can view their own articles"
-  on articles for select
-  using (auth.uid() = user_id);
-
--- Policy: Users can create their own articles
-create policy "Users can create articles"
-  on articles for insert
-  with check (auth.uid() = user_id);
-
--- Policy: Users can update their own articles
-create policy "Users can update own articles"
-  on articles for update
-  using (auth.uid() = user_id);
-
--- Policy: Users can delete their own articles
-create policy "Users can delete own articles"
-  on articles for delete
-  using (auth.uid() = user_id);
-```
-
-### 2. Create Article Composable
-
-Create `src/composables/useArticles.ts`:
-
-```typescript
-import { ref } from 'vue'
-import { supabase } from '@/lib/supabase'
-
-export function useArticles() {
-  const articles = ref([])
-  const loading = ref(false)
-
-  const fetchPublicArticles = async () => {
-    loading.value = true
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('published', true)
-      .order('created_at', { ascending: false })
-    
-    if (error) throw error
-    articles.value = data
-    loading.value = false
-  }
-
-  const createArticle = async (article) => {
-    const { data, error } = await supabase
-      .from('articles')
-      .insert([article])
-      .select()
-    
-    if (error) throw error
-    return data[0]
-  }
-
-  // Add more CRUD operations...
-
-  return {
-    articles,
-    loading,
-    fetchPublicArticles,
-    createArticle
-  }
+```css
+/* In global.css */
+.btn-secondary {
+  background-color: var(--color-text-secondary);
+  color: white;
 }
 ```
 
-### 3. Create Article Components
+### Database Schema
 
-Suggested components:
+#### Add New Columns to Articles
 
-- `ArticleList.vue` - Display list of articles
-- `ArticleCard.vue` - Individual article preview card
-- `ArticleEditor.vue` - Create/edit article form
-- `ArticleView.vue` - Full article view
-
-### 4. Add Article Routes
-
-```typescript
-// router/index.ts
-{
-  path: '/articles/:id',
-  name: 'article-view',
-  component: ArticleView,
-  meta: { requiresAuth: false }
-},
-{
-  path: '/dashboard/articles/new',
-  name: 'article-new',
-  component: ArticleEditor,
-  meta: { requiresAuth: true }
-},
-{
-  path: '/dashboard/articles/:id/edit',
-  name: 'article-edit',
-  component: ArticleEditor,
-  meta: { requiresAuth: true }
-}
-```
-
-## 🌍 Environment Variables
-
-### Local Development
-
-The template uses default local Supabase credentials. No environment variables needed for local development.
-
-### Production
-
-Create `.env` file in the `client` directory:
-
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-**Important:**
-- Never commit `.env` files to git
-- The anon key is safe to expose (protected by Row Level Security)
-- Get credentials from your Supabase project settings
-
-## 📜 Available Scripts
+Create a new migration:
 
 ```bash
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Type-check
-npm run type-check
-
-# Lint code
-npm run lint
-
-# Format code
-npm run format
+supabase migration new add_article_fields
 ```
+
+Edit the migration file:
+
+```sql
+-- supabase/migrations/[timestamp]_add_article_fields.sql
+alter table public.articles 
+add column title text,
+add column published boolean default false;
+```
+
+Apply the migration:
+
+```bash
+supabase db reset
+```
+
+Regenerate types:
+
+```bash
+supabase gen types typescript --local > client/src/types/database.types.ts
+```
+
+#### Add New Tables
+
+```sql
+-- Example: Add comments table
+create table public.comments (
+  id uuid default gen_random_uuid() primary key,
+  article_id uuid references public.articles(id) on delete cascade not null,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  content text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS
+alter table public.comments enable row level security;
+
+-- Add policies
+create policy "Comments are viewable by everyone"
+  on public.comments for select using (true);
+
+create policy "Authenticated users can create comments"
+  on public.comments for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+```
+
+### Authentication
+
+#### Enable Email Confirmation
+
+Edit `supabase/config.toml`:
+
+```toml
+[auth.email]
+enable_confirmations = true  # Change from false to true
+```
+
+Restart Supabase:
+
+```bash
+supabase stop && supabase start
+```
+
+#### Configure OAuth Providers
+
+Edit `supabase/config.toml` to enable providers like GitHub, Google, etc.:
+
+```toml
+[auth.external.github]
+enabled = true
+client_id = "your-github-client-id"
+secret = "env(GITHUB_CLIENT_SECRET)"
+```
+
+---
 
 ## 🚢 Deployment
 
-### Building for Production
+### Prepare for Production
+
+#### 1. Create a Supabase Project
+
+1. Go to [supabase.com](https://supabase.com)
+2. Click "New Project"
+3. Choose organization and set project name
+4. Wait for project setup (2-3 minutes)
+
+#### 2. Link Your Project
 
 ```bash
-cd client
-npm run build
+# Login to Supabase
+supabase login
+
+# Link local project to remote
+supabase link --project-ref your-project-ref
 ```
 
-The build output will be in `client/dist`.
+#### 3. Push Migrations to Production
 
-### Deploy to Vercel
+```bash
+supabase db push
+```
 
-1. Connect your repository to Vercel
-2. Set build settings:
-   - Build Command: `cd client && npm run build`
-   - Output Directory: `client/dist`
-3. Add environment variables:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
+This will apply your local migrations to the production database.
 
-### Deploy to Netlify
+#### 4. Get Production Credentials
 
-1. Connect your repository to Netlify
-2. Set build settings:
-   - Base directory: `client`
-   - Build command: `npm run build`
-   - Publish directory: `client/dist`
-3. Add environment variables in Netlify dashboard
+From your Supabase project dashboard:
+1. Go to Project Settings → API
+2. Copy the **Project URL** and **anon public** key
 
-### Supabase Production Setup
+### Deploy Frontend
 
-1. Create a project at [supabase.com](https://supabase.com)
-2. Get your project URL and anon key from project settings
-3. Run migrations or SQL to create tables
-4. Set up Row Level Security policies
-5. Configure email templates (optional)
+#### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Click "New Project" and import your repository
+4. Configure build settings:
+   - **Framework Preset:** Vite
+   - **Root Directory:** `client`
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+5. Add environment variables:
+   ```
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key
+   ```
+6. Click "Deploy"
+
+#### Deploy to Netlify
+
+1. Push your code to GitHub
+2. Go to [netlify.com](https://netlify.com)
+3. Click "Add new site" → "Import an existing project"
+4. Connect to your repository
+5. Configure build settings:
+   - **Base directory:** `client`
+   - **Build command:** `npm run build`
+   - **Publish directory:** `client/dist`
+6. Add environment variables in Site settings → Environment variables
+7. Click "Deploy site"
+
+### Production Checklist
+
+- [ ] Enable email confirmations in Supabase auth settings
+- [ ] Set up email templates (optional)
+- [ ] Configure OAuth providers if needed
+- [ ] Set up custom domain
+- [ ] Enable database backups
+- [ ] Review and test Row Level Security policies
+- [ ] Set up monitoring/error tracking (e.g., Sentry)
+- [ ] Configure CORS settings if needed
+- [ ] Test image upload functionality
+- [ ] Test authentication flow end-to-end
+
+---
 
 ## 🛠️ Technology Stack
 
 ### Frontend
-- **Vue 3** - Progressive JavaScript framework
-- **TypeScript** - Type safety
-- **Vite** - Next-generation frontend tooling
-- **Vue Router** - Official router for Vue.js
-- **Pinia** - State management (included but optional)
+- **[Vue 3](https://vuejs.org/)** - Progressive JavaScript framework
+- **[TypeScript](https://www.typescriptlang.org/)** - Type safety
+- **[Vite](https://vitejs.dev/)** - Next-generation frontend tooling
+- **[Vue Router](https://router.vuejs.org/)** - Official router for Vue.js
 
-### Backend & Auth
-- **Supabase** - Backend as a Service
+### Backend & Services
+- **[Supabase](https://supabase.com/)** - Backend as a Service
   - PostgreSQL database
-  - Authentication
-  - Row Level Security
+  - Authentication (JWT-based)
+  - Row Level Security (RLS)
+  - File storage with CDN
   - Real-time subscriptions (ready to use)
-  - Storage (ready to use)
 
 ### Development Tools
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **oxlint** - Fast linting
-- **vue-tsc** - TypeScript checker for Vue
+- **[ESLint](https://eslint.org/)** + **[oxlint](https://oxc.rs/)** - Code linting
+- **[Prettier](https://prettier.io/)** - Code formatting
+- **[vue-tsc](https://github.com/vuejs/language-tools)** - TypeScript checker for Vue
 
 ### CSS
 - **Modern CSS** - Custom properties, nesting, color-mix()
 - **No frameworks** - Pure CSS with utility classes
-- **Responsive** - Mobile-first design
+- **Responsive** - Mobile-first design with modern viewport units
 
-## 🔒 Security Best Practices
+---
 
-1. **Row Level Security (RLS)**: Always enable RLS on Supabase tables
-2. **Environment Variables**: Never commit credentials to git
-3. **Validation**: Validate user input on both client and server
-4. **Email Confirmation**: Enable in production for added security
-5. **Password Requirements**: Configured in Supabase (min 6 chars by default)
+## 🔒 Security Features
+
+This boilerplate includes production-ready security:
+
+### Row Level Security (RLS)
+
+All database tables have RLS enabled with policies:
+- Anyone can view articles (public feed)
+- Only authenticated users can create articles
+- Users can only edit/delete their own articles
+- Users can only upload/delete their own images
+
+### Storage Security
+
+The `article-images` bucket has policies ensuring:
+- Public read access (anyone can view images)
+- Only authenticated users can upload
+- Users can only manage their own images (stored in user-specific folders)
+
+### Authentication
+
+- Passwords hashed with bcrypt
+- JWT-based session management
+- Secure HTTP-only cookies (in production)
+- CSRF protection built-in
+- Rate limiting configured
+
+---
 
 ## 📚 Learn More
 
+### Documentation
 - [Vue 3 Documentation](https://vuejs.org/)
 - [Supabase Documentation](https://supabase.com/docs)
-- [Vite Documentation](https://vitejs.dev/)
+- [Supabase CLI Reference](https://supabase.com/docs/reference/cli)
 - [Vue Router Documentation](https://router.vuejs.org/)
-- [MDN CSS Documentation](https://developer.mozilla.org/en-US/docs/Web/CSS)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+
+### Tutorials
+- [Supabase Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
+- [Vue 3 Composition API](https://vuejs.org/guide/extras/composition-api-faq.html)
+- [Modern CSS Features](https://developer.mozilla.org/en-US/docs/Web/CSS)
+
+---
 
 ## 🤝 Contributing
 
 This is a starter template. Feel free to:
-- Fork and customize for your needs
+- Fork and customize for your projects
 - Report issues or suggest improvements
-- Share your projects built with this template
-
-## 📄 License
-
-MIT License - feel free to use this template for any project.
+- Share projects built with this template
 
 ---
 
-**Happy coding! 🚀** Start building your article platform by adding CRUD operations and customizing the design to match your vision.
+## 📄 License
 
+MIT License - Feel free to use this template for any project, commercial or personal.
+
+---
+
+## 🆘 Troubleshooting
+
+### Supabase won't start
+
+**Issue:** Port conflicts
+```bash
+# Stop all containers and restart
+docker stop $(docker ps -aq)
+supabase stop
+supabase start
+```
+
+**Issue:** Docker not running
+- Ensure Docker Desktop is installed and running
+- On macOS/Windows: Check Docker Desktop app is open
+
+### Build Errors
+
+**Issue:** TypeScript errors after schema changes
+```bash
+# Regenerate database types
+supabase gen types typescript --local > client/src/types/database.types.ts
+```
+
+**Issue:** Module not found
+```bash
+cd client
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Authentication Issues
+
+**Issue:** Can't sign up or login
+- Check Supabase status: `supabase status`
+- Verify auth service is running
+- Check browser console for errors
+- Ensure `enable_signup = true` in `supabase/config.toml`
+
+### Storage/Upload Issues
+
+**Issue:** Image upload fails
+- Check storage service is running: `supabase status`
+- Verify storage bucket policies in Supabase Studio
+- Check file size (5MB limit by default)
+- Ensure allowed MIME types are correct
+
+---
+
+## 💬 Support
+
+- **Supabase Discord:** [discord.supabase.com](https://discord.supabase.com)
+- **Vue Discord:** [chat.vuejs.org](https://chat.vuejs.org)
+- **GitHub Issues:** Open an issue in your repository
+
+---
+
+**Happy coding! 🚀** 
+
+Start building your next article platform, blog, or social feed with this production-ready foundation.

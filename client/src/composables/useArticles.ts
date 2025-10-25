@@ -48,7 +48,7 @@ export function useArticles() {
       alert(ERROR_MESSAGES.ARTICLE_UPDATE_FAILED)
     }
 
-    if(data) {
+    if (data) {
       await fetchArticles()
     }
   }
