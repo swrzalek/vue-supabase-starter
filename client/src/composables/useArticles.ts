@@ -1,6 +1,6 @@
 import { ArticleService } from '@/services/article.service'
 import { useAuth } from '@/composables/useAuth'
-import type { Article, CreateArticleDto, UpdateArticleDto } from '@/types'
+import type { Article, CreateArticleDto } from '@/types'
 import { ref } from 'vue'
 
 export const ERROR_MESSAGES = {
@@ -41,7 +41,7 @@ export function useArticles() {
     }
   }
 
-  const updateArticle = async (id: string, article: UpdateArticleDto) => {
+  const updateArticle = async (id: string, article: Pick<Article, 'content'>) => {
     const { data, error } = await ArticleService.update(id, article)
 
     if (error) {

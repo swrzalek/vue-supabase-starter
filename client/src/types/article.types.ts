@@ -15,25 +15,10 @@ export interface Article {
 }
 
 /**
- * Extended article with user information for display
- */
-export interface ArticleWithUser extends Article {
-  user_email: string
-  user_display_name?: string
-}
-
-/**
  * Data transfer object for creating a new article
+ * Uses Pick to select only the content field from Article, plus imageFile
  */
-export interface CreateArticleDto {
-  content: string
+export type CreateArticleDto = Pick<Article, 'content'> & {
   imageFile?: File | null
-}
-
-/**
- * Data transfer object for updating an article
- */
-export interface UpdateArticleDto {
-  content: string
 }
 

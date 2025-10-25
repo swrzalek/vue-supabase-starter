@@ -6,7 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
-import type { Article, CreateArticleDto, UpdateArticleDto } from '@/types'
+import type { Article, CreateArticleDto } from '@/types'
 import { STORAGE_CONFIG } from '@/config/constants'
 import type { PostgrestError } from '@supabase/supabase-js'
 
@@ -52,7 +52,7 @@ export const ArticleService = {
     }
   },
 
-  async update(id: string, dto: UpdateArticleDto) {
+  async update(id: string, dto: Pick<Article, 'content'>) {
     try {
       const { data, error } = await supabase
         .from('articles')

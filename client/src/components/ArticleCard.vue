@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useArticles } from '@/composables/useArticles'
-import type { Article, UpdateArticleDto } from '@/types'
+import type { Article } from '@/types'
 import { formatRelativeTime } from '@/utils/date'
 
 const props = defineProps<{
@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  update: [id: string, payload: UpdateArticleDto]
+  update: [id: string, payload: Pick<Article, 'content'>]
   delete: [id: string, imageUrl: string | null]
 }>()
 
