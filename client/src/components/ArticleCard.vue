@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Article } from '@/composables/useArticles'
 import { useArticles } from '@/composables/useArticles'
+import type { ArticleWithUser } from '@/types'
+import { formatRelativeTime } from '@/utils/date'
 
 const props = defineProps<{
-  article: Article
-}>()
-
-const emit = defineEmits<{
-  articleUpdated: []
-  articleDeleted: []
+  article: ArticleWithUser
 }>()
 
 const { updateArticle, deleteArticle, isOwner } = useArticles()
@@ -18,37 +14,11 @@ const isEditing = ref(false)
 const editContent = ref(props.article.content)
 const isDeleting = ref(false)
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-
-  if (diffInSeconds < 60) return 'just now'
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`
-
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
-const getInitials = (email: string | undefined) => {
-  if (!email) return 'U'
-  const parts = email.split('@')[0]?.split('.') || []
-  return parts
-    .map((part) => part?.[0] || '')
-    .filter(Boolean)
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || 'U'
-}
-
 const handleEdit = async () => {
   if (!editContent.value.trim()) return
 
   try {
-    await updateArticle(props.article.id, editContent.value, () => {
-      emit('articleUpdated')
-    })
+    await updateArticle(props.article.id, { content: editContent.value })
     isEditing.value = false
   } catch (error) {
     console.error('Error updating article:', error)
@@ -60,9 +30,7 @@ const handleDelete = async () => {
 
   isDeleting.value = true
   try {
-    await deleteArticle(props.article.id, props.article.image_url, () => {
-      emit('articleDeleted')
-    })
+    await deleteArticle(props.article.id, props.article.image_url)
   } catch (error) {
     console.error('Error deleting article:', error)
     isDeleting.value = false
@@ -79,10 +47,9 @@ const cancelEdit = () => {
   <article class="article-card" :class="{ deleting: isDeleting }">
     <div class="article-header">
       <div class="article-author">
-        <div class="author-avatar">{{ getInitials(article.user_email || 'User') }}</div>
         <div class="author-info">
           <div class="author-name">{{ article.user_email?.split('@')[0] || 'User' }}</div>
-          <div class="article-time">{{ formatDate(article.created_at) }}</div>
+          <div class="article-time">{{ formatRelativeTime(article.created_at) }}</div>
         </div>
       </div>
 

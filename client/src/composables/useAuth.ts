@@ -1,13 +1,24 @@
+/**
+ * Auth Composable - Manages authentication state
+ *
+ * Provides reactive authentication state and methods.
+ * Uses singleton pattern for shared state across components.
+ */
+
 import { ref, computed } from 'vue'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
+// Shared state (singleton)
 const currentUser = ref<User | null>(null)
 const isLoading = ref(true)
 
 export function useAuth() {
   const isAuthenticated = computed(() => !!currentUser.value)
 
+  /**
+   * Initialize authentication state and set up listeners
+   */
   const initialize = async () => {
     try {
       const {
@@ -27,6 +38,9 @@ export function useAuth() {
     })
   }
 
+  /**
+   * Sign up a new user
+   */
   const signUp = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -36,6 +50,9 @@ export function useAuth() {
     return data
   }
 
+  /**
+   * Sign in an existing user
+   */
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -45,6 +62,9 @@ export function useAuth() {
     return data
   }
 
+  /**
+   * Sign out the current user
+   */
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error

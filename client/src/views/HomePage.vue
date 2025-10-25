@@ -24,7 +24,7 @@ onMounted(async () => {
       </div>
 
       <!-- Article Form - Only for authenticated users -->
-      <ArticleForm v-if="isAuthenticated" @article-created="fetchArticles" />
+      <ArticleForm v-if="isAuthenticated" />
 
       <!-- Call to action for non-authenticated users -->
       <div v-if="!isAuthenticated" class="cta-banner">
@@ -53,13 +53,7 @@ onMounted(async () => {
         </div>
 
         <div v-else class="articles-list">
-          <ArticleCard
-            v-for="article in articles"
-            :key="article.id"
-            :article="article"
-            @article-updated="fetchArticles"
-            @article-deleted="fetchArticles"
-          />
+          <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
         </div>
       </div>
     </div>

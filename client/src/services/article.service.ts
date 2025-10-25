@@ -1,22 +1,13 @@
+/**
+ * Article Service - Data access layer for articles
+ *
+ * This service handles all Supabase interactions for articles.
+ * All database queries and storage operations are centralized here.
+ */
+
 import { supabase } from '@/lib/supabase'
-
-export interface Article {
-  id: string
-  user_id: string
-  content: string
-  image_url: string | null
-  created_at: string
-  updated_at: string
-}
-
-export interface CreateArticleDto {
-  content: string
-  imageFile?: File | null
-}
-
-export interface UpdateArticleDto {
-  content: string
-}
+import type { Article, CreateArticleDto, UpdateArticleDto } from '@/types'
+import { STORAGE_CONFIG } from '@/config/constants'
 
 export const ArticleService = {
   /**
@@ -30,20 +21,6 @@ export const ArticleService = {
 
     if (error) throw error
     return data || []
-  },
-
-  /**
-   * Get a single article by ID
-   */
-  async get(id: string): Promise<Article | null> {
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('id', id)
-      .single()
-
-    if (error) throw error
-    return data
   },
 
   /**
@@ -115,13 +92,15 @@ export const ArticleService = {
     const fileName = `${userId}/${Date.now()}.${fileExt}`
 
     const { error: uploadError } = await supabase.storage
-      .from('article-images')
+      .from(STORAGE_CONFIG.ARTICLE_IMAGES_BUCKET)
       .upload(fileName, file)
 
     if (uploadError) throw uploadError
 
     // Get public URL
-    const { data } = supabase.storage.from('article-images').getPublicUrl(fileName)
+    const { data } = supabase.storage
+      .from(STORAGE_CONFIG.ARTICLE_IMAGES_BUCKET)
+      .getPublicUrl(fileName)
 
     return data.publicUrl
   },
@@ -130,10 +109,12 @@ export const ArticleService = {
    * Delete an image from storage
    */
   async deleteImage(imageUrl: string): Promise<void> {
-    const path = imageUrl.split('/article-images/')[1]
+    const path = imageUrl.split(`/${STORAGE_CONFIG.ARTICLE_IMAGES_BUCKET}/`)[1]
     if (!path) return
 
-    const { error } = await supabase.storage.from('article-images').remove([path])
+    const { error } = await supabase.storage
+      .from(STORAGE_CONFIG.ARTICLE_IMAGES_BUCKET)
+      .remove([path])
 
     if (error) {
       console.error('Error deleting image:', error)

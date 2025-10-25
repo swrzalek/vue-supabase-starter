@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useArticles } from '@/composables/useArticles'
-import { useAuth } from '@/composables/useAuth'
 
-const emit = defineEmits<{
-  articleCreated: []
-}>()
+
+
+const MAX_CONTENT_LENGTH = 500;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
+const VALIDATION_MESSAGES = {
+  REQUIRED_CONTENT: 'Please write something or add an image',
+  MAX_LENGTH_EXCEEDED: `Content must be less than ${MAX_CONTENT_LENGTH} characters`,
+  IMAGE_TOO_LARGE: `Image must be less than ${MAX_IMAGE_SIZE / (1024 * 1024)}MB`,
+  INVALID_IMAGE_TYPE: 'Please select a valid image file',
+  AUTHENTICATION_REQUIRED: 'You must be logged in to perform this action',
+}
 
 const { createArticle, loading } = useArticles()
-const { currentUser } = useAuth()
 
 const content = ref('')
 const imageFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const error = ref('')
-
-const MAX_CONTENT_LENGTH = 500
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
 
 const handleImageSelect = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -27,13 +31,13 @@ const handleImageSelect = (event: Event) => {
 
   // Validate file size
   if (file.size > MAX_IMAGE_SIZE) {
-    error.value = 'Image must be less than 5MB'
+    error.value = VALIDATION_MESSAGES.IMAGE_TOO_LARGE
     return
   }
 
   // Validate file type
   if (!file.type.startsWith('image/')) {
-    error.value = 'Please select an image file'
+    error.value = VALIDATION_MESSAGES.INVALID_IMAGE_TYPE
     return
   }
 
@@ -58,21 +62,21 @@ const removeImage = () => {
 
 const handleSubmit = async () => {
   if (!content.value.trim() && !imageFile.value) {
-    error.value = 'Please write something or add an image'
+    error.value = VALIDATION_MESSAGES.REQUIRED_CONTENT
     return
   }
 
   if (content.value.length > MAX_CONTENT_LENGTH) {
-    error.value = `Content must be less than ${MAX_CONTENT_LENGTH} characters`
+    error.value = VALIDATION_MESSAGES.MAX_LENGTH_EXCEEDED
     return
   }
 
   error.value = ''
 
   try {
-    await createArticle(content.value, imageFile.value, () => {
-      // Emit event to parent to refetch articles
-      emit('articleCreated')
+    await createArticle({
+      content: content.value,
+      imageFile: imageFile.value,
     })
 
     // Reset form
@@ -87,34 +91,24 @@ const handleSubmit = async () => {
   }
 }
 
-const getInitials = (email: string | undefined) => {
-  if (!email) return 'U'
-  const parts = email.split('@')[0]?.split('.') || []
-  return parts
-    .map((part) => part?.[0] || '')
-    .filter(Boolean)
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || 'U'
-}
+
 </script>
 
 <template>
   <div class="article-form">
     <div class="form-header">
-      <div class="user-avatar">{{ getInitials(currentUser?.email) }}</div>
       <div class="form-title">What's on your mind?</div>
     </div>
 
     <form @submit.prevent="handleSubmit" class="form-content">
       <textarea
         v-model="content"
-        class="form-textarea"
-        placeholder="Share your thoughts..."
-        rows="3"
-        :maxlength="MAX_CONTENT_LENGTH"
-        :disabled="loading"
-      ></textarea>
+          class="form-textarea"
+          placeholder="Share your thoughts..."
+          rows="3"
+          :maxlength="MAX_CONTENT_LENGTH"
+          :disabled="loading"
+        ></textarea>
 
       <div v-if="content.length > 0" class="character-count">
         {{ content.length }} / {{ MAX_CONTENT_LENGTH }}
@@ -174,30 +168,13 @@ const getInitials = (email: string | undefined) => {
 }
 
 .form-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }
 
-.user-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.875rem;
-  flex-shrink: 0;
-}
-
 .form-title {
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 1.125rem;
 }
 
 .form-content {

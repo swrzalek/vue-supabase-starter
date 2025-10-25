@@ -9,21 +9,10 @@ const route = useRoute()
 const handleLogout = async () => {
   try {
     await signOut()
-    router.push('/')
+    await router.push('/')
   } catch (error) {
     console.error('Logout error:', error)
   }
-}
-
-const getInitials = (email: string | undefined) => {
-  if (!email) return 'U'
-  const parts = email.split('@')[0]?.split('.') || []
-  return parts
-    .map((part) => part?.[0] || '')
-    .filter(Boolean)
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || 'U'
 }
 </script>
 
@@ -37,15 +26,8 @@ const getInitials = (email: string | undefined) => {
 
         <nav class="nav">
           <template v-if="isAuthenticated">
-            <div class="user-menu">
-              <div class="user-avatar" :title="currentUser?.email ?? 'User'">
-                {{ getInitials(currentUser?.email) }}
-              </div>
-              <div class="user-info">
-                <span class="user-email">{{ currentUser?.email ?? 'User' }}</span>
-                <button @click="handleLogout" class="btn btn-danger btn-sm">Logout</button>
-              </div>
-            </div>
+            <span class="user-email">{{ currentUser?.email }}</span>
+            <button @click="handleLogout" class="btn btn-danger btn-sm">Logout</button>
           </template>
 
           <template v-else>
@@ -63,7 +45,6 @@ const getInitials = (email: string | undefined) => {
 
 <style scoped>
 .header {
-  background-color: var(--color-background);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
@@ -128,36 +109,10 @@ const getInitials = (email: string | undefined) => {
   }
 }
 
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  position: relative;
-}
-
-.user-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.875rem;
-  flex-shrink: 0;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
 .user-email {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
+  font-weight: 500;
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -177,10 +132,6 @@ const getInitials = (email: string | undefined) => {
 
   .logo h1 {
     font-size: 1.25rem;
-  }
-
-  .user-email {
-    display: none;
   }
 
   .nav {
