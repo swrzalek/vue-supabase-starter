@@ -1,40 +1,36 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useArticles } from '@/composables/useArticles'
-import type { ArticleWithUser } from '@/types'
+import type { Article, UpdateArticleDto } from '@/types'
 import { formatRelativeTime } from '@/utils/date'
 
 const props = defineProps<{
-  article: ArticleWithUser
+  article: Article
 }>()
 
-const { updateArticle, deleteArticle, isOwner } = useArticles()
+const emit = defineEmits<{
+  update: [id: string, payload: UpdateArticleDto]
+  delete: [id: string, imageUrl: string | null]
+}>()
+
+const { isOwner } = useArticles()
 
 const isEditing = ref(false)
 const editContent = ref(props.article.content)
-const isDeleting = ref(false)
 
-const handleEdit = async () => {
+const handleEdit = () => {
   if (!editContent.value.trim()) return
 
-  try {
-    await updateArticle(props.article.id, { content: editContent.value })
-    isEditing.value = false
-  } catch (error) {
-    console.error('Error updating article:', error)
-  }
+  // Emit event to parent
+  emit('update', props.article.id, { content: editContent.value })
+  isEditing.value = false
 }
 
-const handleDelete = async () => {
+const handleDelete = () => {
   if (!confirm('Are you sure you want to delete this article?')) return
 
-  isDeleting.value = true
-  try {
-    await deleteArticle(props.article.id, props.article.image_url)
-  } catch (error) {
-    console.error('Error deleting article:', error)
-    isDeleting.value = false
-  }
+  // Emit event to parent
+  emit('delete', props.article.id, props.article.image_url)
 }
 
 const cancelEdit = () => {
@@ -44,11 +40,11 @@ const cancelEdit = () => {
 </script>
 
 <template>
-  <article class="article-card" :class="{ deleting: isDeleting }">
+  <article class="article-card">
     <div class="article-header">
       <div class="article-author">
         <div class="author-info">
-          <div class="author-name">{{ article.user_email?.split('@')[0] || 'User' }}</div>
+          <div class="author-name">User {{ article.user_id.slice(0, 8) }}</div>
           <div class="article-time">{{ formatRelativeTime(article.created_at) }}</div>
         </div>
       </div>
@@ -59,7 +55,6 @@ const cancelEdit = () => {
           @click="isEditing = true"
           class="action-btn"
           title="Edit"
-          :disabled="isDeleting"
         >
           ✏️
         </button>
@@ -67,7 +62,6 @@ const cancelEdit = () => {
           @click="handleDelete"
           class="action-btn action-btn-danger"
           title="Delete"
-          :disabled="isDeleting"
         >
           🗑️
         </button>
@@ -108,10 +102,6 @@ const cancelEdit = () => {
     border-color: color-mix(in srgb, var(--color-primary) 20%, var(--color-border));
   }
 
-  &.deleting {
-    opacity: 0.5;
-    pointer-events: none;
-  }
 }
 
 .article-header {

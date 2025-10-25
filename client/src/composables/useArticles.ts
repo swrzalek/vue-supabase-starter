@@ -1,14 +1,13 @@
 /**
- * Articles Composable - Manages article state and operations
+ * Articles Composable - Provides article service methods
  *
- * Provides reactive article state and CRUD operations.
- * Uses singleton pattern for shared state across components.
+ * This composable provides service methods for article operations.
+ * State management is handled by parent components.
  */
 
-import { ref, computed } from 'vue'
 import { ArticleService } from '@/services/article.service'
 import { useAuth } from '@/composables/useAuth'
-import type { Article, ArticleWithUser, CreateArticleDto, UpdateArticleDto } from '@/types'
+import type { Article, CreateArticleDto, UpdateArticleDto } from '@/types'
 
 export const ERROR_MESSAGES = {
   ARTICLE_CREATE_FAILED: 'Failed to create article',
@@ -19,19 +18,17 @@ export const ERROR_MESSAGES = {
 } as const
 
 export function useArticles() {
-  const articles = ref<Article[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
   const { currentUser } = useAuth()
 
-
+  /**
+   * Fetch all articles
+   */
   const fetchArticles = async () => {
     try {
-      const data = await ArticleService.query()
-      console.log(data);
-      articles.value = data
+      return await ArticleService.query()
     } catch (err) {
-      alert(ERROR_MESSAGES.ARTICLE_FETCH_FAILED);
+      console.error('Error fetching articles:', err)
+      throw err
     }
   }
 
@@ -39,20 +36,17 @@ export function useArticles() {
    * Create a new article
    */
   const createArticle = async (articlePayload: CreateArticleDto) => {
-    if(!currentUser.value) {
-      alert('User not authenticated');
-      return;
+    if (!currentUser.value) {
+      throw new Error('User not authenticated')
     }
 
     const { data, error } = await ArticleService.create(currentUser.value.id, articlePayload)
 
-    if(data) {
-      fetchArticles();
+    if (error) {
+      throw error
     }
 
-    if(error) {
-      alert(ERROR_MESSAGES.ARTICLE_CREATE_FAILED);
-    }
+    return data
   }
 
   /**
@@ -60,44 +54,34 @@ export function useArticles() {
    */
   const updateArticle = async (id: string, article: UpdateArticleDto) => {
     const { data, error } = await ArticleService.update(id, article)
-    if(data) {
-      fetchArticles();
+
+    if (error) {
+      throw error
     }
 
-    if(error) {
-      alert(ERROR_MESSAGES.ARTICLE_UPDATE_FAILED);
-    }
+    return data
   }
 
+  /**
+   * Delete an article
+   */
   const deleteArticle = async (id: string, imageUrl: string | null) => {
-    loading.value = true
-    error.value = null
-
     try {
       await ArticleService.remove(id, imageUrl)
     } catch (err) {
-      error.value = err instanceof Error ? err.message : ERROR_MESSAGES.ARTICLE_DELETE_FAILED
       console.error('Error deleting article:', err)
       throw err
-    } finally {
-      loading.value = false
     }
   }
 
   /**
    * Check if current user owns an article
    */
-  const isOwner = (article: ArticleWithUser): boolean => {
+  const isOwner = (article: Article): boolean => {
     return currentUser.value?.id === article.user_id
   }
 
   return {
-    // State
-    articles: computed(() => articles.value),
-    loading: computed(() => loading.value),
-    error: computed(() => error.value),
-
-    // Actions
     fetchArticles,
     createArticle,
     updateArticle,

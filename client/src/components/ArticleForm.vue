@@ -1,27 +1,27 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useArticles } from '@/composables/useArticles'
+import type { CreateArticleDto } from '@/types'
 
-
-
-const MAX_CONTENT_LENGTH = 500;
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_CONTENT_LENGTH = 500
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
 
 const VALIDATION_MESSAGES = {
   REQUIRED_CONTENT: 'Please write something or add an image',
   MAX_LENGTH_EXCEEDED: `Content must be less than ${MAX_CONTENT_LENGTH} characters`,
   IMAGE_TOO_LARGE: `Image must be less than ${MAX_IMAGE_SIZE / (1024 * 1024)}MB`,
   INVALID_IMAGE_TYPE: 'Please select a valid image file',
-  AUTHENTICATION_REQUIRED: 'You must be logged in to perform this action',
 }
 
-const { createArticle, loading } = useArticles()
+const emit = defineEmits<{
+  create: [payload: CreateArticleDto]
+}>()
 
 const content = ref('')
 const imageFile = ref<File | null>(null)
 const imagePreview = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const error = ref('')
+const loading = ref(false)
 
 const handleImageSelect = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -72,9 +72,11 @@ const handleSubmit = async () => {
   }
 
   error.value = ''
+  loading.value = true
 
   try {
-    await createArticle({
+    // Emit event to parent
+    emit('create', {
       content: content.value,
       imageFile: imageFile.value,
     })
@@ -88,10 +90,10 @@ const handleSubmit = async () => {
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to post article'
+  } finally {
+    loading.value = false
   }
 }
-
-
 </script>
 
 <template>
