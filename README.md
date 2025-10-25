@@ -2,6 +2,8 @@
 
 A modern, production-ready boilerplate for building article/social feed applications with Vue 3, TypeScript, Supabase, and custom CSS. Features complete authentication, article CRUD with image uploads, and a beautiful responsive design.
 
+![BeatFlow Preview](./client/public/img.png)
+
 ## ✨ Features
 
 - ✅ **Vue 3** with Composition API and `<script setup>`
